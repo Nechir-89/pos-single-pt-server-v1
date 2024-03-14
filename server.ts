@@ -15,10 +15,10 @@ webserver.use(routes);
 
 const port = 5002;
 webserver.listen(port, () => {
-  console.log(`DCC WAREHOUSE SERVER`);
-  console.log(`VERSION 2.1.2`);
-  console.log(`AUTHER: TECHCAMP`);
-  console.log(`RELEASED DATE: MARCH 04, 2024`);
+  console.log(`TC POS Single Point Server`);
+  console.log(`SERVER VERSION: ${process.env.SERVER_VERSION}`);
+  console.log(`AUTHOR: ${process.env.AUTHOR}`);
+  // console.log(`RELEASED DATE: MARCH 04, 2024`);
   console.log(`SERVER PORT: ${port}`);
   console.log(`-----------------------------`);
   console.log();
