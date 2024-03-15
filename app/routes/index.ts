@@ -7,6 +7,7 @@ import { Router } from 'express';
 // import warehouse_router from './warehouse_route';
 // import added_amounts from './added_amounts'
 import users_router from './users_router'
+import auth_router from './auth_route'
 
 
 const router = Router();
@@ -20,5 +21,6 @@ const router = Router();
 // router.use('/api/addedamounts', added_amounts);
 
 router.use('/api/users', users_router)
+router.use('/auth', auth_router)
 
 export default router;
