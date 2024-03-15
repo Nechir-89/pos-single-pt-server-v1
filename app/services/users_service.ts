@@ -4,50 +4,50 @@ const bcrypt = require('bcryptjs');
 // import bcrypt from 'bcryptjs'
 
 export const get_users_service = async () => {
-  console.log(`Finding all users...`);
+  console.log(`Looking all users...`);
   try {
     const respond = await db.any(`SELECT * FROM ${process.env.DB_SCHEMA}.users`);
-    console.log(`Passed: found all users.`);
+    console.log(`Passed: all users found`);
     return respond;
   } catch (error) {
-    console.log(`Failed: finding users ==> ${error}`);
+    console.log(`Failed: Looking users ==> ${error}`);
     return ({ error: `DB error` });
   }
 }
 
-export const get_user_service = async (id: number) => {
-  console.log(`Finding user ${id}`)
+export const get_user_service = async (user_id: number) => {
+  console.log(`Looking user id: ${user_id}`)
   try {
-    const query = `SELECT * FROM ${process.env.DB_SCHEMA}.users WHERE id = $<id>`;
-    const respond: User | null = await db.oneOrNone(query, { id });
+    const query = `SELECT * FROM ${process.env.DB_SCHEMA}.users WHERE user_id = $<user_id>`;
+    const respond: User | null = await db.oneOrNone(query, { user_id });
 
     if (respond?.user_name)
-      console.log(`Passed: found user.`);
+      console.log(`Passed: user found`);
     else
-      console.log(`Passed: found no user with user id ${id}`)
+      console.log(`Passed: found no user with user id ${user_id}`)
 
     return respond;
   } catch (error) {
-    console.log(`Failed: finding user ==> ${error}`);
+    console.log(`Failed: Looking user ==> ${error}`);
     return ({ error: `DB error` });
   }
 }
 
 
 export const get_user_by_name_service = async (user_name: string) => {
-  console.log(`Finding user ${user_name}`)
+  console.log(`Looking user ${user_name}`)
   try {
     const query = `SELECT * FROM ${process.env.DB_SCHEMA}.users WHERE user_name = $<user_name>`;
     const respond: User | null = await db.oneOrNone(query, { user_name });
 
     if (respond?.user_name)
-      console.log(`Passed: found user.`);
+      console.log(`Passed: user found`);
     else
       console.log(`Passed: found no user with user name ${user_name}`)
 
     return respond;
   } catch (error) {
-    console.log(`Failed: finding user ==> ${error}`);
+    console.log(`Failed: looking user ==> ${error}`);
     return ({ error: `DB error` });
   }
 }
@@ -66,7 +66,7 @@ export const add_user_service = async (user: Omit<User, 'user_id'>) => {
     console.log(`Passed: user ${user.user_name} created`)
     return respond;
   } catch (error) {
-    console.log(`Failed: Creating user ==> ${error}`);
+    console.log(`Failed: creating user ==> ${error}`);
     return ({ error: `DB error` });
   }
 }

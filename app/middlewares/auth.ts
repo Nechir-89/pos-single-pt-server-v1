@@ -11,8 +11,18 @@ export const register: RequestHandler<
 > = async (req, res: Response) => {
   try {
     const { user_name, passcode, role } = req.body;
+    
+    if(passcode?.length < 4 || passcode?.length > 16){
+      console.log(`Failed: creating new user, passcode too short or too long`)
+      return res.status(400).json({ error: `Client error` });
+    }
+    
+    if(!(role === 'admin' || role === 'cashier')){
+      console.log(`Failed: creating new user, role must be admin or cashier`)
+      return res.status(400).json({ error: `Client error` });
+    }
+    
     const existingUser = await get_user_by_name_service(user_name);
-
     if (existingUser) {
       console.log(`Failed: creating new user, user ${user_name} already exist!`)
       return res.status(400).json({ error: `Client error` });
