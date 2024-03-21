@@ -21,6 +21,7 @@ export const add_category_service = async (name: string) => {
     VALUES($<name>)`;
     const respond = await db.none(query, { name });
     console.log(`Passed: category ${name} created`)
+    return respond
   } catch (error) {
     console.log(`Failed: creating category ==> ${error}`);
     return ({ error: `DB error` });
