@@ -1,4 +1,4 @@
-import { Cates } from "../../types/cates.types";
+import { Cates } from "../../types/Category.types";
 import { db } from "../database/db";
 
 export const get_cates_service = async () => {

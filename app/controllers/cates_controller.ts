@@ -6,7 +6,7 @@ import {
   remove_cate_service,
   update_cate_service
 } from "../services/cates_service";
-import { Cates } from "../../types/cates.types";
+import { Cates } from "../../types/Category.types";
 
 
 export const get_cates: RequestHandler<

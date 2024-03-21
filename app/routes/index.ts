@@ -6,9 +6,9 @@ import { Router } from 'express';
 // import cates_router from './cates_route';
 // import warehouse_router from './warehouse_route';
 // import added_amounts from './added_amounts'
-import users_router from './users_router'
-import auth_router from './auth_route'
-
+import users_routes from './users_routes'
+import auth_routes from './auth_routes'
+import categories_routes from './categories_routes'
 
 const router = Router();
 
@@ -20,7 +20,8 @@ const router = Router();
 // router.use('/api/warehouse', warehouse_router);
 // router.use('/api/addedamounts', added_amounts);
 
-router.use('/api/users', users_router)
-router.use('/auth', auth_router)
+router.use('/api/users', users_routes)
+router.use('/auth', auth_routes)
+router.use('/api/categories', categories_routes)
 
 export default router;
