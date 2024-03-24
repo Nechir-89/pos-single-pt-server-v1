@@ -18,8 +18,8 @@ export const add_unit_service = async (name: string) => {
   console.log(`Creating new unit ${name}`)
   try {
     const query = `INSERT INTO ${process.env.DB_SCHEMA}.units (unit_name) 
-    VALUES($<name>)`;
-    const respond = await db.any(query, { name });
+    VALUES($<name>) RETURNING unit_id`;
+    const respond = await db.one(query, { name });
     console.log(`Passed: unit ${name} created`)
     return respond
   } catch (error) {

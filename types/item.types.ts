@@ -1,41 +1,10 @@
-export interface Item {
-  id: number;
-  name: string;
-  cates_id: number;
-  warehouse_id: number;
-  first_entery: number;
-  date: Date;
-  added: number;
-  inuse: number;
-  removed: number;
-  current: number;
-  barcode: string;
-  username: string;
-  changed: number;
-  exchange: boolean;
-  returned: number;
-  price: number,
-  note: string
-}
-
-export interface ItemDocument {
-  id: number;
-  name: string;
-  cates_id: number;
-  cates_name: string;
-  unit_type: string,
-  warehouse_id: number;
-  first_entery: number;
-  date: Date;
-  added: number;
-  inuse: number;
-  returned: number;
-  removed: number;
-  current: number;
-  barcode: string;
-  username: string;
-  changed: number;
-  exchange: boolean;
-  price: number;
-  note: string
+export type Item = {
+  item_name: string,
+  pcs_per_unit: number,
+  user_id: number,
+  category_id: number,
+  note: string,
+  unit_id: number,
+  archived: boolean,
+  pc_unit_id: number
 }
