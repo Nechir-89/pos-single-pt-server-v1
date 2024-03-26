@@ -30,6 +30,21 @@ export const add_item_service = async (model: Item) => {
   }
 }
 
+export const delete_item_service = async (item_id: number) => {
+  console.log(`Deleting item with item id ${item_id}`)
+
+  try {
+    const query = `DELETE FROM ${process.env.DB_SCHEMA}.items WHERE item_id=$<item_id>`;
+    const respond = await db.none(query, { item_id });
+    console.log(`Passed: deleting item with item id ${item_id}`)
+    return respond;
+  } catch (error) {
+    console.log(`Failed: deleting item with item id ${item_id} ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
+
+
 // export const get_warehouse_documents_service = async (warehouse_id: number) => {
 //   console.log(`Getting documents of warehouse ${warehouse_id}`);
 //   try {

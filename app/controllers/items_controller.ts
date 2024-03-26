@@ -2,15 +2,7 @@ import { RequestHandler, Request, Response } from 'express'
 import {
   get_items_service,
   add_item_service,
-  // get_item_service,
-  // update_item_service,
-  // remove_item_service,
-  // get_all_items_service,
-  // get_warehouse_documents_service,
-  // update_removed_amount_service,
-  // get_warehouse_item_documents_based_on_barcode_service,
-  // clean_damaged_goods_service,
-  // move_changed_to_damaged_service
+  delete_item_service
 } from '../services/items_service'
 import { Item } from '../../types/item.types';
 
@@ -22,6 +14,37 @@ export const get_items: RequestHandler<
 > = async (req, res: Response) => {
   try {
     const respond = await get_items_service();
+    res.status(200).json(respond);
+  } catch (error) {
+    console.log(`server is running into an error \n ${error}`);
+    res.status(500).json({ error: "Server error" });
+  }
+}
+
+
+export const add_item: RequestHandler<
+  never,
+  Response,
+  Omit<Item, "id">,
+  never
+> = async (req, res: Response) => {
+  try {
+    const respond = await add_item_service(req.body);
+    res.status(201).json(respond);
+  } catch (error) {
+    console.log(`server is running into an error \n ${error}`);
+    res.status(500).json({ error: "Server error" });
+  }
+}
+
+export const delete_item: RequestHandler<
+  never,
+  Response,
+  { item_id: number },
+  never
+> = async (req, res: Response) => {
+  try {
+    const respond = await delete_item_service(req.body.item_id);
     res.status(200).json(respond);
   } catch (error) {
     console.log(`server is running into an error \n ${error}`);
@@ -89,20 +112,6 @@ export const get_items: RequestHandler<
 //   }
 // }
 
-export const add_item: RequestHandler<
-  never,
-  Response,
-  Omit<Item, "id">,
-  never
-> = async (req, res: Response) => {
-  try {
-    const respond = await add_item_service(req.body);
-    res.status(200).json(respond);
-  } catch (error) {
-    console.log(`server is running into an error \n ${error}`);
-    res.status(500).json({ error: "Server error" });
-  }
-}
 
 // export const update_item: RequestHandler<
 //   never,

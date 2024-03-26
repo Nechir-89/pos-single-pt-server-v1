@@ -1,8 +1,8 @@
 import { RequestHandler, Response } from "express";
 import { Item } from "../../types/item.types";
 import { Stock } from "../../types/Stock.types";
-import { add_item_service } from "../services/items_service";
-import { add_stock_service } from "../services/stocks_service";
+import { add_item_service, delete_item_service } from "../services/items_service";
+import { add_stock_service, delete_stock_service } from "../services/stocks_service";
 import { State } from "../../types/State.types";
 import { add_item_state_service } from "../services/states_service";
 
@@ -46,7 +46,6 @@ export const new_item: RequestHandler<
       try {
         const stock = await add_stock_service(stockData)
         if (stock?.stocking_id) {
-
           const stateData: State = {
             item_id: item.item_id,
             stocking_id: stock.stocking_id,
@@ -71,12 +70,19 @@ export const new_item: RequestHandler<
 
           try {
             const state = await add_item_state_service(stateData)
+            if (!state.state_id) {
+              // roll back and delete item and stock
+              await delete_item_service(item.item_id)
+              await delete_stock_service(stock.stocking_id)
+            }
             res.status(201).json(state)
           } catch (error) {
             console.log(`server is running into an error \n ${error}`);
             res.status(500).json({ error: "Server error" });
           }
         } else {
+          // roll back and delete item
+          await delete_item_service(item.item_id)
           console.log(`There is an error with stocking_id ${stock?.stocking_id}`);
           res.status(500).json({ error: "Error" });
         }

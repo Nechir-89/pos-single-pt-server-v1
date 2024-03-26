@@ -1,7 +1,8 @@
 import { RequestHandler, Response } from 'express'
 import {
   get_stocks_service,
-  add_stock_service
+  add_stock_service,
+  delete_stock_service
 } from '../services/stocks_service'
 import { Stock } from '../../types/Stock.types';
 
@@ -28,6 +29,21 @@ export const add_stock: RequestHandler<
 > = async (req, res: Response) => {
   try {
     const respond = await add_stock_service(req.body);
+    res.status(201).json(respond);
+  } catch (error) {
+    console.log(`server is running into an error \n ${error}`);
+    res.status(500).json({ error: "Server error" });
+  }
+}
+
+export const delete_stock: RequestHandler<
+  never,
+  Response,
+  { stocking_id: number },
+  never
+> = async (req, res: Response) => {
+  try {
+    const respond = await delete_stock_service(req.body.stocking_id);
     res.status(200).json(respond);
   } catch (error) {
     console.log(`server is running into an error \n ${error}`);

@@ -2,21 +2,14 @@ import { Router } from "express";
 import {
   get_items,
   add_item,
-  // get_item,
-  // update_item,
-  // remove_item,
-  // get_all_items,
-  // get_warehouse_documents,
-  // update_removed_amount,
-  // get_warehouse_item_documents_based_on_barcode,
-  // clean_damaged_goods,
-  // move_changed_to_damaged
+  delete_item
 } from "../controllers/items_controller";
 
 const router = Router();
 
 router.get('/', get_items);
 router.post('/', add_item);
+router.delete('/', delete_item);
 
 // router.get('/all', get_all_items);
 // router.get('/:id', get_item);

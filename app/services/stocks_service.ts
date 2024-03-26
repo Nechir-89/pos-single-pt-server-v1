@@ -29,3 +29,17 @@ export const add_stock_service = async (model: Omit<Stock, 'stocking_id'>) => {
     return ({ error: `DB error` });
   }
 }
+
+export const delete_stock_service = async (stocking_id: number) => {
+  console.log(`Deleting stock with stocking id ${stocking_id}`)
+
+  try {
+    const query = `DELETE FROM ${process.env.DB_SCHEMA}.stocking WHERE stocking_id=$<stocking_id>`;
+    const respond = await db.none(query, { stocking_id });
+    console.log(`Passed: deleting stock with stocking id ${stocking_id}`)
+    return respond;
+  } catch (error) {
+    console.log(`Failed: deleting stock with stocking id ${stocking_id} ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
