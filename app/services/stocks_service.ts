@@ -18,8 +18,8 @@ export const add_stock_service = async (model: Omit<Stock, 'stocking_id'>) => {
 
   try {
     const query = `INSERT INTO ${process.env.DB_SCHEMA}.stocking(
-      unit_cost, unit_price, pc_cost, pc_price, amount_in_units, expire_date, user_id, item_id, note, production_date, barcode, pc_barcode)
-      VALUES ( $<unit_cost>, $<unit_price>, $<pc_cost>, $<pc_price>, $<amount_in_units>, $<expire_date>, $<user_id>, $<item_id>, $<note>, $<production_date>, $<barcode>, $<pc_barcode>) 
+      unit_cost, unit_price, pc_cost, pc_price, amount_in_units, expire_date, user_id, item_id, stocking_note, production_date, barcode, pc_barcode)
+      VALUES ( $<unit_cost>, $<unit_price>, $<pc_cost>, $<pc_price>, $<amount_in_units>, $<expire_date>, $<user_id>, $<item_id>, $<stocking_note>, $<production_date>, $<barcode>, $<pc_barcode>) 
       RETURNING stocking_id`;
     const respond = await db.one(query, model);
     console.log(`Passed: stock created for item id ${model.item_id}`)

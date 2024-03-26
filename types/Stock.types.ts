@@ -9,7 +9,7 @@ export type Stock = {
   expire_date: Date, 
   user_id: number, 
   item_id: number, 
-  note: string, 
+  stocking_note: string, 
   production_date?: Date, 
   barcode?: string, 
   pc_barcode?: string

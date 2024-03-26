@@ -17,5 +17,5 @@ export type State = {
   expired_units: number, 
   expired_pcs: number, 
   returned_units_to_supplier: number, 
-  returned_pcs_to_supplier: number
+  returned_pcs_to_supplier: number 
 }

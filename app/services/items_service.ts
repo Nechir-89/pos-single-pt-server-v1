@@ -18,14 +18,14 @@ export const add_item_service = async (model: Item) => {
 
   try {
     const query = `INSERT INTO ${process.env.DB_SCHEMA}.items 
-    (item_name, pcs_per_unit, user_id, category_id, note, unit_id, archived, pc_unit_id) 
-    VALUES($<item_name>, $<pcs_per_unit>, $<user_id>, $<category_id>, $<note>, $<unit_id>, $<archived>, $<pc_unit_id>) 
+    (item_name, pcs_per_unit, user_id, category_id, item_note, unit_id, archived, pc_unit_id) 
+    VALUES($<item_name>, $<pcs_per_unit>, $<user_id>, $<category_id>, $<item_note>, $<unit_id>, $<archived>, $<pc_unit_id>) 
     RETURNING item_id`;
     const respond = await db.one(query, model);
     console.log(`Passed: item ${model.item_name} created`)
     return respond;
   } catch (error) {
-    console.log(`Failed: creating user ==> ${error}`);
+    console.log(`Failed: creating new item ==> ${error}`);
     return ({ error: `DB error` });
   }
 }
