@@ -1,10 +1,12 @@
 import { RequestHandler, Response } from "express";
-import { Item } from "../../types/item.types";
+import { Item } from "../../types/Item.types";
 import { Stock } from "../../types/Stock.types";
 import { add_item_service, delete_item_service } from "../services/items_service";
 import { add_stock_service, delete_stock_service } from "../services/stocks_service";
-import { State } from "../../types/State.types";
-import { add_item_state_service } from "../services/states_service";
+import { StockState } from "../../types/State.types";
+import { add_stock_state_service, delete_stock_state_service } from "../services/states_service";
+import { ItemState } from "../../types/ItemState.types";
+import { add_item_state_service } from "../services/items_state_service";
 
 export const new_item: RequestHandler<
   never,
@@ -26,7 +28,6 @@ export const new_item: RequestHandler<
 
   try {
     const item = await add_item_service(itemData)
-
     if (item?.item_id) {
       const stockData: Stock = {
         amount_in_units: req.body.amount_in_units,
@@ -46,7 +47,7 @@ export const new_item: RequestHandler<
       try {
         const stock = await add_stock_service(stockData)
         if (stock?.stocking_id) {
-          const stateData: State = {
+          const stateData: StockState = {
             item_id: item.item_id,
             stocking_id: stock.stocking_id,
             current_units: stockData.amount_in_units,
@@ -69,11 +70,32 @@ export const new_item: RequestHandler<
           }
 
           try {
-            const state = await add_item_state_service(stateData)
+            const state = await add_stock_state_service(stateData)
             if (!state.state_id) {
               // roll back and delete item and stock
-              await delete_item_service(item.item_id)
               await delete_stock_service(stock.stocking_id)
+              await delete_item_service(item.item_id)
+              console.log(`There is an error with stock state id ${state?.state_id}`);
+              res.status(500).json({ error: "Error" });
+            } else {
+              const itemStateData: Omit<ItemState, 'item_state_id'> = {
+                item_id: item.item_id,
+                total_available_pcs: stateData.current_units,
+                total_available_units: stateData.current_pcs
+              }
+              try {
+                const itemState = await add_item_state_service(itemStateData)
+                if (!itemState?.item_state_id) {
+                  await delete_stock_state_service(state?.state_id)
+                  await delete_stock_service(stock.stocking_id)
+                  await delete_item_service(item.item_id)
+                  console.log(`There is an error with item state id ${itemState?.item_state_id}`);
+                  res.status(500).json({ error: "Error" });
+                }
+              } catch (error) {
+                console.log(`server is running into an error \n ${error}`);
+                res.status(500).json({ error: "Server error" });
+              }
             }
             res.status(201).json(state)
           } catch (error) {

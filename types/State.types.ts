@@ -1,4 +1,4 @@
-export type State = {
+export type StockState = {
   state_id?: number, 
   item_id: number, 
   stocking_id: number, 

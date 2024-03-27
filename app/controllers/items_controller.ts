@@ -4,7 +4,7 @@ import {
   add_item_service,
   delete_item_service
 } from '../services/items_service'
-import { Item } from '../../types/item.types';
+import { Item } from '../../types/Item.types';
 
 export const get_items: RequestHandler<
   never,

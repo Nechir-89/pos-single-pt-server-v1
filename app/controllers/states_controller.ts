@@ -1,18 +1,19 @@
 import { RequestHandler, Response } from 'express'
 import { 
-  get_items_states_service,
-  add_item_state_service
+  get_stocks_states_service,
+  add_stock_state_service,
+  delete_stock_state_service
  } from '../services/states_service';
-import { State } from '../../types/State.types';
+import { StockState } from '../../types/State.types';
 
-export const get_items_states: RequestHandler<
+export const get_stocks_states: RequestHandler<
   never,
   Response,
   never,
   never
 > = async (req, res: Response) => {
   try {
-    const respond = await get_items_states_service();
+    const respond = await get_stocks_states_service();
     res.status(200).json(respond);
   } catch (error) {
     console.log(`server is running into an error \n ${error}`);
@@ -20,14 +21,29 @@ export const get_items_states: RequestHandler<
   }
 }
 
-export const add_item_state: RequestHandler<
+export const add_stock_state: RequestHandler<
   never,
   Response,
-  Omit<State, "state_id">,
+  Omit<StockState, "state_id">,
   never
 > = async (req, res: Response) => {
   try {
-    const respond = await add_item_state_service(req.body);
+    const respond = await add_stock_state_service(req.body);
+    res.status(201).json(respond);
+  } catch (error) {
+    console.log(`server is running into an error \n ${error}`);
+    res.status(500).json({ error: "Server error" });
+  }
+}
+
+export const delete_stock_state: RequestHandler<
+  never,
+  Response,
+  {state_id: number},
+  never
+> = async (req, res: Response) => {
+  try {
+    const respond = await delete_stock_state_service(req.body.state_id);
     res.status(200).json(respond);
   } catch (error) {
     console.log(`server is running into an error \n ${error}`);

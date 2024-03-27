@@ -6,8 +6,9 @@ import units_routes from './units_routes'
 import pcs_routes from './pcs_routes'
 import item_routes from './items_routes'
 import stock_routes from './stocks_routes'
-import items_states_router from './states_routes'
+import states_router from './states_routes'
 import { new_item } from '../middlewares/new_item';
+import items_states_router from './items_states_routes'
 
 const router = Router();
 
@@ -20,7 +21,9 @@ router.use('/api/items', item_routes)
 
 router.post('/api/items/new', new_item)
 
-router.use('/api/items/states', items_states_router)
+router.use('/api/states/stocks', states_router)
+router.use('/api/states/items', items_states_router)
+
 router.use('/api/stocks', stock_routes)
 
 export default router;

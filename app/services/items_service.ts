@@ -1,4 +1,4 @@
-import { Item } from '../../types/item.types';
+import { Item } from '../../types/Item.types';
 import { db } from '../database/db';
 
 export const get_items_service = async () => {
