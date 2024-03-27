@@ -80,8 +80,8 @@ export const new_item: RequestHandler<
             } else {
               const itemStateData: Omit<ItemState, 'item_state_id'> = {
                 item_id: item.item_id,
-                total_available_pcs: stateData.current_units,
-                total_available_units: stateData.current_pcs
+                total_available_pcs: stateData.current_pcs,
+                total_available_units: stateData.current_units
               }
               try {
                 const itemState = await add_item_state_service(itemStateData)
