@@ -28,3 +28,22 @@ export const add_item_state_service = async (model: Omit<ItemState, 'item_state_
     return ({ error: `DB error` });
   }
 }
+
+export const update_item_state_service = async (model: Omit<ItemState, 'item_state_id'>) => {
+  console.log(`Updating item state for item id ${model.item_id}`)
+
+  try {
+    const query = `UPDATE ${process.env.DB_SCHEMA}.items_state 
+                    SET total_available_units = (SELECT total_available_units FROM ${process.env.DB_SCHEMA}.items_state WHERE item_id = $<item_id>) + $<total_available_units>, 
+                        total_available_pcs = (SELECT total_available_pcs FROM ${process.env.DB_SCHEMA}.items_state WHERE item_id = $<item_id>) + $<total_available_pcs> 
+                    WHERE item_id = $<item_id> 
+                    RETURNING item_state_id`;
+
+    const respond = await db.one(query, model);
+    console.log(`Passed: item state updated for item id ${model.item_id}`)
+    return respond;
+  } catch (error) {
+    console.log(`Failed: Updating item state for item id ${model.item_id} ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}

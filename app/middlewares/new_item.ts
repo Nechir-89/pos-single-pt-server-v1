@@ -92,12 +92,13 @@ export const new_item: RequestHandler<
                   console.log(`There is an error with item state id ${itemState?.item_state_id}`);
                   res.status(500).json({ error: "Error" });
                 }
+                
+                res.status(201).json({ message: 'New item added' });
               } catch (error) {
                 console.log(`server is running into an error \n ${error}`);
                 res.status(500).json({ error: "Server error" });
               }
             }
-            res.status(201).json(state)
           } catch (error) {
             console.log(`server is running into an error \n ${error}`);
             res.status(500).json({ error: "Server error" });
