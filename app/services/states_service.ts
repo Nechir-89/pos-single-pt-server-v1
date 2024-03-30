@@ -147,7 +147,7 @@ export const get_stocks_states_docs_by_item_name_service = async (item_name: str
                     AND items.unit_id = units.unit_id 
                     AND items.pc_unit_id = pcs_units.pc_unit_id  
                     AND items.item_name = $<item_name> 
-                  ORDER BY stocks_state.state_id DES`
+                  ORDER BY stocks_state.state_id DESC`
     const respond = await db.any(query, {item_name});
     console.log(`Passed: all stocks states documents found for item ${item_name}`);
     return respond;

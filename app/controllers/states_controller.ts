@@ -88,11 +88,11 @@ export const get_stocks_states_docs_by_barcode: RequestHandler<
 export const get_stocks_states_docs_by_item_name: RequestHandler<
   never,
   Response,
-  { barcode: string },
+  { item_name: string },
   never
 > = async (req, res: Response) => {
   try {
-    const respond = await get_stocks_states_docs_by_item_name_service(req.body.barcode);
+    const respond = await get_stocks_states_docs_by_item_name_service(req.body.item_name);
     res.status(200).json(respond);
   } catch (error) {
     console.log(`server is running into an error \n ${error}`);
