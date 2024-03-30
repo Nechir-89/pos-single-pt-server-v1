@@ -34,7 +34,7 @@ export const delete_stock_state_service = async (state_id: number) => {
 
   try {
     const query = `DELETE FROM ${process.env.DB_SCHEMA}.stocks_state WHERE state_id = $<state_id>`;
-    const respond = await db.one(query, {state_id});
+    const respond = await db.one(query, { state_id });
     console.log(`Passed: stock state of id ${state_id} deleted`)
     return respond;
   } catch (error) {
@@ -42,3 +42,118 @@ export const delete_stock_state_service = async (state_id: number) => {
     return ({ error: `DB error` });
   }
 }
+
+export const get_stocks_states_docs_service = async () => {
+  console.log(`Looking all stocks states documents...`);
+  try {
+    const query = `SELECT 
+                    stocks_state.*, 
+                    s.unit_cost, s.unit_price, s.pc_cost, s.pc_price, s.barcode, s.pc_barcode, 
+                    s.amount_in_units, s.stocking_note, s.date, s.production_date, s.expire_date, 
+                    categories.category_name, 
+                    units.unit_name, 
+                    pcs_units.pc_unit_name, 
+                    items.item_name, 
+                    users.user_name  
+                  FROM 
+                    ${process.env.DB_SCHEMA}.stocks_state, 
+                    ${process.env.DB_SCHEMA}.stocking AS s, 
+                    ${process.env.DB_SCHEMA}.items, 
+                    ${process.env.DB_SCHEMA}.users, 
+                    ${process.env.DB_SCHEMA}.categories, 
+                    ${process.env.DB_SCHEMA}.units, 
+                    ${process.env.DB_SCHEMA}.pcs_units 
+                  WHERE
+                    stocks_state.stocking_id = s.stocking_id 
+                    AND s.item_id = items.item_id 
+                    AND s.user_id = users.user_id 
+                    AND items.category_id = categories.category_id 
+                    AND items.unit_id = units.unit_id 
+                    AND items.pc_unit_id = pcs_units.pc_unit_id  
+
+                  ORDER BY stocks_state.state_id DESC`
+    const respond = await db.any(query);
+    console.log(`Passed: all stocks states documents found`);
+    return respond;
+  } catch (error) {
+    console.log(`Failed: Looking stocks states documents ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
+
+export const get_stocks_states_docs_by_barcode_service = async (barcode: string) => {
+  console.log(`Looking all stocks states documents for barcode ${barcode}`);
+  try {
+    const query = `SELECT 
+                    stocks_state.*, 
+                    s.unit_cost, s.unit_price, s.pc_cost, s.pc_price, s.barcode, s.pc_barcode, 
+                    s.amount_in_units, s.stocking_note, s.date, s.production_date, s.expire_date, 
+                    categories.category_name, 
+                    units.unit_name, 
+                    pcs_units.pc_unit_name, 
+                    items.item_name, 
+                    users.user_name 
+                  FROM 
+                    ${process.env.DB_SCHEMA}.stocks_state, 
+                    ${process.env.DB_SCHEMA}.stocking AS s, 
+                    ${process.env.DB_SCHEMA}.items, 
+                    ${process.env.DB_SCHEMA}.users, 
+                    ${process.env.DB_SCHEMA}.categories, 
+                    ${process.env.DB_SCHEMA}.units, 
+                    ${process.env.DB_SCHEMA}.pcs_units 
+                  WHERE
+                    stocks_state.stocking_id = s.stocking_id 
+                    AND s.item_id = items.item_id 
+                    AND s.user_id = users.user_id 
+                    AND items.category_id = categories.category_id 
+                    AND items.unit_id = units.unit_id 
+                    AND items.pc_unit_id = pcs_units.pc_unit_id  
+                    AND (s.barcode = $<barcode> OR s.pc_barcode = $<barcode>) 
+                  ORDER BY stocks_state.state_id DESC`
+    const respond = await db.any(query, { barcode });
+    console.log(`Passed: all stocks states documents for barcode ${barcode} found`);
+    return respond;
+  } catch (error) {
+    console.log(`Failed: Looking stocks states documents for barcode ${barcode} ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
+
+export const get_stocks_states_docs_by_item_name_service = async (item_name: string) => {
+  console.log(`Looking all stocks states documents for item ${item_name}`);
+  try {
+    const query = `SELECT 
+                    stocks_state.*, 
+                    s.unit_cost, s.unit_price, s.pc_cost, s.pc_price, s.barcode, s.pc_barcode, 
+                    s.amount_in_units, s.stocking_note, s.date, s.production_date, s.expire_date, 
+                    categories.category_name, 
+                    units.unit_name, 
+                    pcs_units.pc_unit_name, 
+                    items.item_name, 
+                    users.user_name 
+                  FROM 
+                    ${process.env.DB_SCHEMA}.stocks_state, 
+                    ${process.env.DB_SCHEMA}.stocking AS s, 
+                    ${process.env.DB_SCHEMA}.items, 
+                    ${process.env.DB_SCHEMA}.users, 
+                    ${process.env.DB_SCHEMA}.categories, 
+                    ${process.env.DB_SCHEMA}.units, 
+                    ${process.env.DB_SCHEMA}.pcs_units 
+                  WHERE
+                    stocks_state.stocking_id = s.stocking_id 
+                    AND s.item_id = items.item_id 
+                    AND s.user_id = users.user_id 
+                    AND items.category_id = categories.category_id 
+                    AND items.unit_id = units.unit_id 
+                    AND items.pc_unit_id = pcs_units.pc_unit_id  
+                    AND items.item_name = $<item_name> 
+                  ORDER BY stocks_state.state_id DES`
+    const respond = await db.any(query, {item_name});
+    console.log(`Passed: all stocks states documents found for item ${item_name}`);
+    return respond;
+  } catch (error) {
+    console.log(`Failed: Looking stocks states documents found for item ${item_name} ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
+
