@@ -13,6 +13,23 @@ export const get_stocks_states_service = async () => {
   }
 }
 
+export const get_nonzero_stock_states_by_item_id_service = async (item_id: number) => {
+  console.log(`Looking all non zero stock states for item ${item_id}`);
+  try {
+    const respond = await db.any(`SELECT * 
+    FROM ${process.env.DB_SCHEMA}.stocks_state 
+    WHERE item_id = $<item_id> AND current_pcs != 0
+    ORDER BY state_id ASC`, { item_id });
+
+    console.log(`Passed: all non zero stock states found for item ${item_id}`);
+
+    return respond;
+  } catch (error) {
+    console.log(`Failed: Looking non zero stock states for item ${item_id} ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
+
 export const add_stock_state_service = async (model: Omit<StockState, 'state_id'>) => {
   console.log(`Creating new stock state for item id ${model.item_id}`)
 
@@ -148,7 +165,7 @@ export const get_stocks_states_docs_by_item_name_service = async (item_name: str
                     AND items.pc_unit_id = pcs_units.pc_unit_id  
                     AND items.item_name = $<item_name> 
                   ORDER BY stocks_state.state_id DESC`
-    const respond = await db.any(query, {item_name});
+    const respond = await db.any(query, { item_name });
     console.log(`Passed: all stocks states documents found for item ${item_name}`);
     return respond;
   } catch (error) {
