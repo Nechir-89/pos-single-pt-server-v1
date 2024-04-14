@@ -1,10 +1,13 @@
 import { StockState } from '../../types/State.types';
 import { db } from '../database/db';
 
-export const get_stocks_states_service = async () => {
-  console.log(`Looking all stocks states...`);
+export const get_non_zero_stock_states_service = async () => {
+  console.log(`Looking all non zero stock states`);
   try {
-    const respond = await db.any(`SELECT * FROM ${process.env.DB_SCHEMA}.stocks_state`);
+    const respond = await db.any(`SELECT * 
+    FROM ${process.env.DB_SCHEMA}.stocks_state 
+    WHERE current_pcs != 0`);
+
     console.log(`Passed: all stocks states found`);
     return respond;
   } catch (error) {
@@ -82,6 +85,7 @@ export const get_stocks_states_docs_service = async () => {
                     ${process.env.DB_SCHEMA}.pcs_units 
                   WHERE
                     stocks_state.stocking_id = s.stocking_id 
+                    AND stocks_state.current_pcs != 0
                     AND s.item_id = items.item_id 
                     AND s.user_id = users.user_id 
                     AND items.category_id = categories.category_id 

@@ -89,6 +89,9 @@ export const add_invoice_and_items_service = async (model: InvoiceRequestBody) =
               console.log(`Failed: updating item state for item ${item.item_id} ==> ${err}`);
               return ({ error: `DB error` });
             }
+          } else {
+            console.log(`Failed: fetching item't total available units and pcs ${itemState}`);
+            return ({ error: `DB error` });
           }
 
         } catch (error) {
@@ -111,11 +114,12 @@ export const add_invoice_and_items_service = async (model: InvoiceRequestBody) =
               if (index == 0)
                 diff = state.current_units - item.quantity
               else
-                diff = state.current_units + newQuantity
+                diff = state.current_units + newQuantity // 2- 0.5 = 1.5
+
               if (diff >= 0.0) {
                 const units = diff
                 const pcs = state.current_pcs - ((index == 0 ? item.quantity : (newQuantity * (-1))) * item.pcs_per_unit)
-
+                
                 const updateStateQuery = `UPDATE ${process.env.DB_SCHEMA}.stocks_state 
                     SET current_units = $<units>, current_pcs = $<pcs> 
                     WHERE state_id = $<state_id> RETURNING stocking_id`
@@ -159,9 +163,9 @@ export const add_invoice_and_items_service = async (model: InvoiceRequestBody) =
 
               let diff = 0
               if (index == 0)
-                diff = state.current_pcs - item.quantity
+                diff = state.current_pcs - item.quantity 
               else
-                diff = state.current_pcs + newQuantity
+                diff = state.current_pcs + newQuantity 
 
               if (diff >= 0.0) {
                 const pcs = diff
@@ -206,7 +210,7 @@ export const add_invoice_and_items_service = async (model: InvoiceRequestBody) =
             }
           }
         } catch (error) {
-          console.log(`Failed: adding invoice item ==> ${error}`);
+          console.log(`Failed: fetching non zero stock states for item ${item.item_id} ==> ${error}`);
           return ({ error: `DB error` });
         }
       });

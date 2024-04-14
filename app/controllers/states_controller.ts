@@ -1,6 +1,6 @@
 import { RequestHandler, Response } from 'express'
 import {
-  get_stocks_states_service,
+  get_non_zero_stock_states_service,
   add_stock_state_service,
   delete_stock_state_service,
   get_stocks_states_docs_service,
@@ -16,7 +16,7 @@ export const get_stocks_states: RequestHandler<
   never
 > = async (req, res: Response) => {
   try {
-    const respond = await get_stocks_states_service();
+    const respond = await get_non_zero_stock_states_service();
     res.status(200).json(respond);
   } catch (error) {
     console.log(`server is running into an error \n ${error}`);
