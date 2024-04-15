@@ -119,7 +119,7 @@ export const add_invoice_and_items_service = async (model: InvoiceRequestBody) =
               if (diff >= 0.0) {
                 const units = diff
                 const pcs = state.current_pcs - ((index == 0 ? item.quantity : (newQuantity * (-1))) * item.pcs_per_unit)
-                
+
                 const updateStateQuery = `UPDATE ${process.env.DB_SCHEMA}.stocks_state 
                     SET current_units = $<units>, current_pcs = $<pcs> 
                     WHERE state_id = $<state_id> RETURNING stocking_id`
@@ -163,9 +163,9 @@ export const add_invoice_and_items_service = async (model: InvoiceRequestBody) =
 
               let diff = 0
               if (index == 0)
-                diff = state.current_pcs - item.quantity 
+                diff = state.current_pcs - item.quantity
               else
-                diff = state.current_pcs + newQuantity 
+                diff = state.current_pcs + newQuantity
 
               if (diff >= 0.0) {
                 const pcs = diff
@@ -220,6 +220,59 @@ export const add_invoice_and_items_service = async (model: InvoiceRequestBody) =
     return resp
   } catch (error) {
     console.log(`Failed: adding invoice ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
+
+export const get_invoice_documents_service = async () => {
+  console.log('Getting all invoice documents')
+  try {
+    const query = `SELECT invoices.*, invoice_items.*, 
+                          items.item_name, units.unit_name, 
+                          pcs_units.pc_unit_name 
+                    FROM  ${process.env.DB_SCHEMA}.invoices, 
+                          ${process.env.DB_SCHEMA}.invoice_items, 
+                          ${process.env.DB_SCHEMA}.items, 
+                          ${process.env.DB_SCHEMA}.units, 
+                          ${process.env.DB_SCHEMA}.pcs_units 
+                    WHERE invoices.invoice_id = invoice_items.invoice_id 
+                        AND invoice_items.item_id = items.item_id 
+                        AND items.unit_id = units.unit_id  
+                        AND items.pc_unit_id = pcs_units.pc_unit_id 
+                        
+                    ORDER BY invoices.invoice_id DESC`;
+    const response = await db.any(query)
+    return response
+  } catch (error) {
+    console.log(`Failed: getting all invoice documents ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
+
+export const get_invoice_document_by_offset_service = async (offset: number) => {
+  console.log(`Getting invoice document by offset ${offset}`)
+  try {
+    const query = `SELECT invoices.*, invoice_items.*, 
+                          items.item_name, units.unit_name, 
+                          pcs_units.pc_unit_name 
+                    FROM ${process.env.DB_SCHEMA}.invoices, ${process.env.DB_SCHEMA}.invoice_items, 
+                          ${process.env.DB_SCHEMA}.items, ${process.env.DB_SCHEMA}.units, 
+                          ${process.env.DB_SCHEMA}.pcs_units 
+                    WHERE invoice_items.item_id = items.item_id
+                          AND items.unit_id = units.unit_id 
+                          AND items.pc_unit_id = pcs_units.pc_unit_id 
+                          AND invoices.invoice_id = invoice_items.invoice_id 
+                          AND invoice_items.invoice_id = (
+                                        SELECT invoices.invoice_id 
+                                        FROM ${process.env.DB_SCHEMA}.invoices 
+                                        ORDER BY invoice_id DESC 
+                                        LIMIT 1 OFFSET $<offset>) 
+
+                    ORDER BY invoices.invoice_id DESC `;
+    const response = await db.any(query, { offset })
+    return response
+  } catch (error) {
+    console.log(`Failed: getting invoice document by offset ==> ${error}`);
     return ({ error: `DB error` });
   }
 }
