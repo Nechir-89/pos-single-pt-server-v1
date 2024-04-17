@@ -267,12 +267,103 @@ export const get_invoice_document_by_offset_service = async (offset: number) => 
                                         FROM ${process.env.DB_SCHEMA}.invoices 
                                         ORDER BY invoice_id DESC 
                                         LIMIT 1 OFFSET $<offset>) 
+                          `;
 
-                    ORDER BY invoices.invoice_id DESC `;
     const response = await db.any(query, { offset })
+    console.log(`Passed: found invoice document of offset ${offset}`);
     return response
   } catch (error) {
     console.log(`Failed: getting invoice document by offset ==> ${error}`);
     return ({ error: `DB error` });
   }
 }
+
+export const get_invoice_document_by_invoice_id_service = async (invoice_id: number) => {
+  console.log(`Getting invoice document by invoice id ${invoice_id}`)
+  try {
+    const query = `SELECT invoices.*, invoice_items.*, 
+                          items.item_name, units.unit_name, 
+                          pcs_units.pc_unit_name 
+                    FROM ${process.env.DB_SCHEMA}.invoices, ${process.env.DB_SCHEMA}.invoice_items, 
+                          ${process.env.DB_SCHEMA}.items, ${process.env.DB_SCHEMA}.units, 
+                          ${process.env.DB_SCHEMA}.pcs_units 
+                    WHERE invoice_items.item_id = items.item_id
+                          AND items.unit_id = units.unit_id 
+                          AND items.pc_unit_id = pcs_units.pc_unit_id 
+                          AND invoices.invoice_id = invoice_items.invoice_id 
+                          AND invoice_items.invoice_id = $<invoice_id>
+
+                    ORDER BY invoices.invoice_id DESC `;
+    const response = await db.any(query, { invoice_id })
+    console.log(`Passed: found invoice document of id ${invoice_id}`);
+    return response
+  } catch (error) {
+    console.log(`Failed: getting invoice document by invoice id ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
+
+export const total_profit_service = async () => {
+  console.log(`Getting total of profit from beginnign to this moment`)
+  try {
+    const query = `SELECT COUNT(*), SUM(paid_price) as total_price, 
+                    SUM(invoice_cost) as total_cost, SUM(gifted_amount) as total_gifted  
+                    FROM ${process.env.DB_SCHEMA}.invoices `;
+    const response = await db.one(query)
+    console.log(`Passed: found sum of total price and total cost`);
+    return response
+  } catch (error) {
+    console.log(`Failed: getting total of profit from beginnign to this moment ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
+
+export const total_profit_for_today_service = async () => {
+  console.log(`Getting total of profit for today`)
+  try {
+    const query = `SELECT COUNT(*), SUM(paid_price) as total_price, 
+                    SUM(invoice_cost) as total_cost, SUM(gifted_amount) as total_gifted 
+                    FROM ${process.env.DB_SCHEMA}.invoices 
+                    WHERE invoice_date > CURRENT_DATE `;
+    const response = await db.one(query)
+    console.log(`Passed: found sum of total price and total cost for today`);
+    return response
+  } catch (error) {
+    console.log(`Failed: getting total of profit for today ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
+
+export const total_profit_for_last_week_service = async () => {
+  console.log(`Getting total of profit for last week`)
+  try {
+    const query = `SELECT COUNT(*), SUM(paid_price) as total_price, 
+                    SUM(invoice_cost) as total_cost, SUM(gifted_amount) as total_gifted 
+                    FROM ${process.env.DB_SCHEMA}.invoices 
+                    WHERE invoice_date > CURRENT_DATE - 7`;
+    const response = await db.one(query)
+    console.log(`Passed: found sum of total price and total cost for last week`);
+    return response
+  } catch (error) {
+    console.log(`Failed: getting total of profit for last week ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
+
+export const total_profit_for_last_month_service = async () => {
+  console.log(`Getting total of profit for last month`)
+  try {
+    const query = `SELECT COUNT(*), SUM(paid_price) as total_price, 
+                    SUM(invoice_cost) as total_cost, SUM(gifted_amount) as total_gifted 
+                    FROM ${process.env.DB_SCHEMA}.invoices 
+                    WHERE invoice_date > CURRENT_DATE - 30`;
+    const response = await db.one(query)
+    console.log(`Passed: found sum of total price and total cost for last month`);
+    return response
+  } catch (error) {
+    console.log(`Failed: getting total of profit for last month ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
+
+
