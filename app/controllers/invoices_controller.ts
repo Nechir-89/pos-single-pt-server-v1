@@ -1,6 +1,14 @@
 import { RequestHandler, Response } from 'express'
 import { InvoiceRequestBody } from '../../types/Invoice.types';
-import { add_invoice_and_items_service, get_invoice_document_by_invoice_id_service, get_invoice_document_by_offset_service, total_profit_for_last_month_service, total_profit_for_last_week_service, total_profit_for_today_service, total_profit_service } from '../services/invoices_service';
+import {
+  add_invoice_and_items_service,
+  get_invoice_document_by_invoice_id_service,
+  get_invoice_document_by_offset_service,
+  total_profit_for_last_month_service,
+  total_profit_for_last_week_service,
+  total_profit_for_today_service,
+  total_profit_service
+} from '../services/invoices_service';
 
 export const add_invoice: RequestHandler<
   never,
@@ -20,7 +28,7 @@ export const add_invoice: RequestHandler<
 export const get_invoice_document_by_offset: RequestHandler<
   never,
   Response,
-  {offset: number},
+  { offset: number },
   never
 > = async (req, res: Response) => {
   try {
@@ -35,7 +43,7 @@ export const get_invoice_document_by_offset: RequestHandler<
 export const get_invoice_document_by_invoice_id: RequestHandler<
   never,
   Response,
-  {invoice_id: number},
+  { invoice_id: number },
   never
 > = async (req, res: Response) => {
   try {

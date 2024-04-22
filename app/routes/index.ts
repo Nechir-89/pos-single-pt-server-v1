@@ -12,6 +12,7 @@ import items_states_router from './items_states_routes'
 import general_queries_router from './general_queries_routes'
 import { new_stock } from '../middlewares/new_stock';
 import invoices_router from './invoices_routes';
+import non_scan_router from './non_scan_router';
 
 const router = Router();
 
@@ -34,5 +35,7 @@ router.post('/api/stocks/new', new_stock)
 router.use('/api/general/stocks', general_queries_router)
 
 router.use('/api/invoices', invoices_router)
+
+router.use('/api/non-scan', non_scan_router)
 
 export default router;
