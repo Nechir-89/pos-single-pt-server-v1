@@ -17,3 +17,8 @@ dist
 
 # exe file
 server-win.exe
+
+
+# distributores
+server-linux
+server-macos

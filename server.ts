@@ -3,8 +3,9 @@ import dotenv from 'dotenv';
 import routes from './app/routes/index'
 import bodyParser from 'body-parser';
 import { cors } from './config/cors';
+import path from 'path';
 
-dotenv.config();
+dotenv.config({ path: path.join(process.cwd(), '.env') });
 const webserver = express();
 webserver.use(cors);
 // bodyParser Link: expressjs.com/en/resources/middleware/body-parser.html
