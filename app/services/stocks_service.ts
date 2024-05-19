@@ -43,3 +43,20 @@ export const delete_stock_service = async (stocking_id: number) => {
     return ({ error: `DB error` });
   }
 }
+
+export const update_stock_expire_date_service = async (stocking_id: number, expire_date: string) => {
+  console.log(`Updating stock expire date for stocking id ${stocking_id}`)
+
+  try {
+    const query = `UPDATE ${process.env.DB_SCHEMA}.stocking 
+                    SET expire_date = $<expire_date> 
+                    WHERE stocking_id = $<stocking_id> 
+                    RETURNING stocking_id`;
+    const respond = await db.one(query, { stocking_id, expire_date });
+    console.log(`Passed: stock expire date updated`)
+    return respond;
+  } catch (error) {
+    console.log(`Failed: updating stock expire date ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
