@@ -178,3 +178,49 @@ export const get_stocks_states_docs_by_item_name_service = async (item_name: str
   }
 }
 
+
+export const set_stock_state_expire_service = async (
+  item_id: number,
+  state_id: number,
+  current_units: number,
+  current_pcs: number
+) => {
+  console.log(`Setting stock expire quantity for stock state id ${state_id}`)
+
+  try {
+    const updateStocksStateQuery = `UPDATE ${process.env.DB_SCHEMA}.stocks_state 
+                    SET current_units = 0, 
+                        current_pcs = 0, 
+                        expired_units = $<current_units>, 
+                        expired_pcs = $<current_pcs> WHERE state_id = $<state_id> 
+                    RETURNING state_id`;
+
+    const UpdateItemStateQuery = `UPDATE ${process.env.DB_SCHEMA}.items_state 
+                    SET total_available_units = (SELECT total_available_units 
+                                                  FROM ${process.env.DB_SCHEMA}.items_state 
+                                                WHERE item_id = $<item_id> ) - $<current_units>, 
+                        total_available_pcs = (SELECT total_available_pcs 
+                                                  FROM ${process.env.DB_SCHEMA}.items_state 
+                                                WHERE item_id = $<item_id> )  - $<current_pcs> 
+                    WHERE item_id = $<item_id> 
+                    RETURNING item_state_id`
+                    
+    await db.one(UpdateItemStateQuery, {
+      item_id,
+      current_units,
+      current_pcs
+    })
+
+    const respond = await db.one(updateStocksStateQuery, {
+      state_id,
+      current_units,
+      current_pcs
+    });
+
+    console.log(`Passed: stock state has been set to expire`)
+    return respond;
+  } catch (error) {
+    console.log(`Failed: updating stock state ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
