@@ -60,3 +60,21 @@ export const update_stock_expire_date_service = async (stocking_id: number, expi
     return ({ error: `DB error` });
   }
 }
+
+export const update_stock_barcodes_service = async (stocking_id: number, barcode: string | null, pc_barcode: string | null) => {
+  console.log(`Updating stock barcods for stocking id ${stocking_id}`)
+
+  try {
+    const query = `UPDATE ${process.env.DB_SCHEMA}.stocking 
+                    SET barcode = $<barcode>, 
+                    pc_barcode = $<pc_barcode> 
+                    WHERE stocking_id = $<stocking_id> 
+                    RETURNING stocking_id`;
+    const respond = await db.one(query, { stocking_id, barcode, pc_barcode });
+    console.log(`Passed: stock expire date updated`)
+    return respond;
+  } catch (error) {
+    console.log(`Failed: updating stock expire date ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
