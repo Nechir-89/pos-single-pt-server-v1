@@ -204,7 +204,7 @@ export const set_stock_state_expire_service = async (
                                                 WHERE item_id = $<item_id> )  - $<current_pcs> 
                     WHERE item_id = $<item_id> 
                     RETURNING item_state_id`
-                    
+
     await db.one(UpdateItemStateQuery, {
       item_id,
       current_units,
@@ -221,6 +221,66 @@ export const set_stock_state_expire_service = async (
     return respond;
   } catch (error) {
     console.log(`Failed: updating stock state ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
+
+export const set_stock_state_damaged_items_service = async (
+  item_id: number,
+  state_id: number,
+  damaged_units: number,
+  damaged_pcs: number
+) => {
+  console.log(`Setting stock damaged quantity for stock state id ${state_id}`)
+
+  try {
+    const updateStocksStateQuery = `UPDATE ${process.env.DB_SCHEMA}.stocks_state 
+                    SET current_units = (SELECT current_units 
+                                          FROM ${process.env.DB_SCHEMA}.stocks_state 
+                                          WHERE state_id = $<state_id>) - ( $<damaged_units> - (SELECT damaged_units 
+                                            FROM ${process.env.DB_SCHEMA}.stocks_state 
+                                            WHERE state_id = $<state_id>) ), 
+                        current_pcs = (SELECT current_pcs 
+                                          FROM ${process.env.DB_SCHEMA}.stocks_state 
+                                          WHERE state_id = $<state_id>) - ( $<damaged_pcs> - (SELECT damaged_pcs 
+                                            FROM ${process.env.DB_SCHEMA}.stocks_state 
+                                            WHERE state_id = $<state_id>) ), 
+                        damaged_units = $<damaged_units>, 
+                        damaged_pcs = $<damaged_pcs> 
+                        WHERE state_id = $<state_id> 
+                    RETURNING state_id`;
+
+    const UpdateItemStateQuery = `UPDATE ${process.env.DB_SCHEMA}.items_state 
+                    SET total_available_units = (SELECT total_available_units 
+                                                  FROM ${process.env.DB_SCHEMA}.items_state 
+                                                WHERE item_id = $<item_id> ) - ($<damaged_units> - (SELECT damaged_units 
+                                                  FROM ${process.env.DB_SCHEMA}.stocks_state 
+                                                  WHERE state_id = $<state_id>)), 
+                        total_available_pcs = (SELECT total_available_pcs 
+                                                  FROM ${process.env.DB_SCHEMA}.items_state 
+                                                WHERE item_id = $<item_id> )  - ($<damaged_pcs> - (SELECT damaged_pcs 
+                                                  FROM ${process.env.DB_SCHEMA}.stocks_state 
+                                                  WHERE state_id = $<state_id>))
+                    WHERE item_id = $<item_id> 
+                    RETURNING item_state_id`
+
+    await db.one(UpdateItemStateQuery, {
+      item_id,
+      state_id,
+      damaged_units,
+      damaged_pcs
+    })
+
+    const respond = await db.one(updateStocksStateQuery, {
+      state_id,
+      damaged_units,
+      damaged_pcs
+    });
+
+    console.log(`Passed: damaged quantity has been set to stock state ${state_id}`)
+    return respond;
+  } catch (error) {
+    console.log(`Failed: updating damaged quantity for stock state ${state_id} : ==> ${error}`);
     return ({ error: `DB error` });
   }
 }

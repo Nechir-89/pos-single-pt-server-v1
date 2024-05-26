@@ -6,7 +6,8 @@ import {
   get_stocks_states_docs,
   get_stocks_states_docs_by_barcode,
   get_stocks_states_docs_by_item_name,
-  set_stock_state_expire
+  set_stock_state_expire,
+  set_stock_state_damaged_items
 } from "../controllers/states_controller";
 
 const router = Router();
@@ -19,5 +20,6 @@ router.post('/docsbybarcode', get_stocks_states_docs_by_barcode)
 router.post('/docsbyitemname', get_stocks_states_docs_by_item_name)
 router.delete('/', delete_stock_state)
 router.put('/update/expire_stock', set_stock_state_expire);
+router.put('/update/damaged_items', set_stock_state_damaged_items);
 
 export default router;
