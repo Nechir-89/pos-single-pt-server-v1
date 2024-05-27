@@ -2,6 +2,7 @@
 
 ### Notes
 - In version one, there are no APIs for (expired_items, damaged_items, and perked_items) tables
+- The term supplier used in place of wholesaler
 
 ### Updating stock expire date
 - Version will be set to 1.2.0
@@ -34,3 +35,17 @@
   - damaged_pcs ===> stocks_state
 - equation for updating total available units in item state table (TAI = TAI - (damaged items - previous damaged items))
 - equation for updating current items in stock state table  (Current Items = Current Items - (damaged items - previous damaged items))
+
+
+### Returning items to wholesaler
+- The version number will be set 1.6.0
+- Effected tables (item_state and stocks_state)
+- Effected Fields
+  - total_available_units ==> item_state
+  - total_available_pcs ===> item_state
+  - current_pcs ===> stocks_state
+  - current_units ===> stocks_state
+  - returned_units_to_supplier ===> stocks_state
+  - returned_pcs_to_supplier ===> stocks_state
+- equation for updating total available units in item state table (TAI = TAI - (returned items - previous returned items))
+- equation for updating current items in stock state table  (Current Items = Current Items - (returned items - previous returned items))

@@ -7,7 +7,8 @@ import {
   get_stocks_states_docs_by_barcode_service,
   get_stocks_states_docs_by_item_name_service,
   set_stock_state_expire_service,
-  set_stock_state_damaged_items_service
+  set_stock_state_damaged_items_service,
+  returned_to_wholesaler_service
 } from '../services/states_service';
 import { StockState } from '../../types/State.types';
 
@@ -146,6 +147,32 @@ export const set_stock_state_damaged_items: RequestHandler<
       req.body.state_id,
       req.body.damaged_units,
       req.body.damaged_pcs
+    );
+    // http response code for update either going to be 200 or 204 (no content)
+    res.status(200).json(respond);
+  } catch (error) {
+    console.log(`server is running into an error \n ${error}`);
+    res.status(500).json({ error: "Server error" });
+  }
+}
+
+export const returned_to_wholesaler: RequestHandler<
+  never,
+  Response,
+  {
+    item_id: number,
+    state_id: number,
+    returned_units_to_supplier: number,
+    returned_pcs_to_supplier: number
+  },
+  never
+> = async (req, res: Response) => {
+  try {
+    const respond = await returned_to_wholesaler_service(
+      req.body.item_id,
+      req.body.state_id,
+      req.body.returned_units_to_supplier,
+      req.body.returned_pcs_to_supplier
     );
     // http response code for update either going to be 200 or 204 (no content)
     res.status(200).json(respond);

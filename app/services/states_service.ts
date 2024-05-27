@@ -284,3 +284,63 @@ export const set_stock_state_damaged_items_service = async (
     return ({ error: `DB error` });
   }
 }
+
+export const returned_to_wholesaler_service = async (
+  item_id: number,
+  state_id: number,
+  returned_units_to_supplier: number,
+  returned_pcs_to_supplier: number
+) => {
+  console.log(`Setting stock damaged quantity for stock state id ${state_id}`)
+
+  try {
+    const updateStocksStateQuery = `UPDATE ${process.env.DB_SCHEMA}.stocks_state 
+                    SET current_units = (SELECT current_units 
+                                          FROM ${process.env.DB_SCHEMA}.stocks_state 
+                                          WHERE state_id = $<state_id>) - ( $<returned_units_to_supplier> - (SELECT returned_units_to_supplier 
+                                            FROM ${process.env.DB_SCHEMA}.stocks_state 
+                                            WHERE state_id = $<state_id>) ), 
+                        current_pcs = (SELECT current_pcs 
+                                          FROM ${process.env.DB_SCHEMA}.stocks_state 
+                                          WHERE state_id = $<state_id>) - ( $<returned_pcs_to_supplier> - (SELECT returned_pcs_to_supplier 
+                                            FROM ${process.env.DB_SCHEMA}.stocks_state 
+                                            WHERE state_id = $<state_id>) ), 
+                        returned_units_to_supplier = $<returned_units_to_supplier>, 
+                        returned_pcs_to_supplier = $<returned_pcs_to_supplier> 
+                        WHERE state_id = $<state_id> 
+                    RETURNING state_id`;
+
+    const UpdateItemStateQuery = `UPDATE ${process.env.DB_SCHEMA}.items_state 
+                    SET total_available_units = (SELECT total_available_units 
+                                                  FROM ${process.env.DB_SCHEMA}.items_state 
+                                                WHERE item_id = $<item_id> ) - ($<returned_units_to_supplier> - (SELECT returned_units_to_supplier 
+                                                  FROM ${process.env.DB_SCHEMA}.stocks_state 
+                                                  WHERE state_id = $<state_id>)), 
+                        total_available_pcs = (SELECT total_available_pcs 
+                                                  FROM ${process.env.DB_SCHEMA}.items_state 
+                                                WHERE item_id = $<item_id> )  - ($<returned_pcs_to_supplier> - (SELECT returned_pcs_to_supplier 
+                                                  FROM ${process.env.DB_SCHEMA}.stocks_state 
+                                                  WHERE state_id = $<state_id>))
+                    WHERE item_id = $<item_id> 
+                    RETURNING item_state_id`
+
+    await db.one(UpdateItemStateQuery, {
+      item_id,
+      state_id,
+      returned_units_to_supplier,
+      returned_pcs_to_supplier
+    })
+
+    const respond = await db.one(updateStocksStateQuery, {
+      state_id,
+      returned_units_to_supplier,
+      returned_pcs_to_supplier
+    });
+
+    console.log(`Passed: retrurned to supplier has been set to stock state ${state_id}`)
+    return respond;
+  } catch (error) {
+    console.log(`Failed: retrurned to supplier for stock state ${state_id} : ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
