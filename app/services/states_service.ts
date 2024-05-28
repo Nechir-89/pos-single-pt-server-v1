@@ -50,7 +50,7 @@ export const add_stock_state_service = async (model: Omit<StockState, 'state_id'
 }
 
 export const delete_stock_state_service = async (state_id: number) => {
-  console.log(`Creating new stock state of id ${state_id}`)
+  console.log(`Deleting stock state of id ${state_id}`)
 
   try {
     const query = `DELETE FROM ${process.env.DB_SCHEMA}.stocks_state WHERE state_id = $<state_id>`;

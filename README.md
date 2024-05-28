@@ -49,3 +49,11 @@
   - returned_pcs_to_supplier ===> stocks_state
 - equation for updating total available units in item state table (TAI = TAI - (returned items - previous returned items))
 - equation for updating current items in stock state table  (Current Items = Current Items - (returned items - previous returned items))
+
+### Deleting stock
+- This will set server version to 1.7.0
+- To delete stock
+  - First update item state (total available items)
+  - Second delete stock state conected to the stock
+  - Finaly delete stock record
+- frontend should make sure stock can be deleted
