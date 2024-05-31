@@ -46,8 +46,8 @@ export const delete_stock_service = async (stocking_id: number) => {
 }
 
 export const delete_stock_service_2 = async (
-  item_id: number, 
-  stocking_id: number, 
+  item_id: number,
+  stocking_id: number,
   state_id: number) => {
   console.log(`Deleting stock with stocking id ${stocking_id}`)
 
@@ -65,7 +65,7 @@ export const delete_stock_service_2 = async (
                                                         WHERE state_id=$<state_id>) 
                               WHERE item_id=$<item_id> 
                               RETURNING item_id`
-    await db.one(itemStateQuery, {item_id, state_id})
+    await db.one(itemStateQuery, { item_id, state_id })
     await delete_stock_state_service(state_id)
     const query = `DELETE FROM ${process.env.DB_SCHEMA}.stocking WHERE stocking_id=$<stocking_id>`;
     const respond = await db.none(query, { stocking_id });
@@ -108,6 +108,58 @@ export const update_stock_barcodes_service = async (stocking_id: number, barcode
     return respond;
   } catch (error) {
     console.log(`Failed: updating stock expire date ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
+
+export const update_stock_amount_in_units_service = async (
+  item_id: number,
+  stocking_id: number,
+  state_id: number,
+  newtotalQuantityInUnits: number,
+  old_quantity_in_units: number,
+  newCurrentUnits: number,
+  newCurrentPcs: number
+) => {
+  console.log(`Updating stock amount in units for stocking id ${stocking_id}`)
+  
+  try {
+    // Update current units and pcs in stocks state table
+    const updateStocksStateQuery = `UPDATE ${process.env.DB_SCHEMA}.stocks_state 
+                                    SET current_units = $<newCurrentUnits>, 
+                                        current_pcs = $<newCurrentPcs> 
+                                    WHERE state_id = $<state_id> 
+                                    RETURNING state_id`
+    await db.one(updateStocksStateQuery, { state_id, newCurrentUnits, newCurrentPcs })
+
+    // Update amount_in_units in stocking table
+    const updateStockQuery = `UPDATE ${process.env.DB_SCHEMA}.stocking 
+                              SET amount_in_units = $<newtotalQuantityInUnits> 
+                              WHERE stocking_id = $<stocking_id> 
+                              RETURNING stocking_id`
+    await db.one(updateStockQuery, { stocking_id, newtotalQuantityInUnits })
+
+    // Update total available units and pcs in items_state table
+    const UpdateItemStateQuery = `UPDATE ${process.env.DB_SCHEMA}.items_state 
+                                  SET total_available_units = (SELECT total_available_units FROM ${process.env.DB_SCHEMA}.items_state WHERE item_id = $<item_id>) 
+                                                                  + ($<newtotalQuantityInUnits> - $<old_quantity_in_units>), 
+                                      total_available_pcs = ((SELECT total_available_units FROM ${process.env.DB_SCHEMA}.items_state WHERE item_id = $<item_id>) 
+                                                                  + ($<newtotalQuantityInUnits> - $<old_quantity_in_units>)) 
+                                                                * (SELECT pcs_per_unit FROM ${process.env.DB_SCHEMA}.stocks_state WHERE state_id = $<state_id>)
+                                  WHERE item_id = $<item_id> 
+                                  RETURNING item_id`
+
+    const respond = await db.one(UpdateItemStateQuery, {
+      item_id,
+      state_id, 
+      newtotalQuantityInUnits,
+      old_quantity_in_units
+    })
+
+    console.log(`Passed: amount in units has been updated`)
+    return respond;
+  } catch (error) {
+    console.log(`Failed: updating amount in units  ==> ${error}`);
     return ({ error: `DB error` });
   }
 }

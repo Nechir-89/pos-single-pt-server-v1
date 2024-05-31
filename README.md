@@ -57,3 +57,16 @@
   - Second delete stock state conected to the stock
   - Finaly delete stock record
 - frontend should make sure stock can be deleted
+
+### Updating stock amount in units
+- This will set server version to 1.8.0
+- Effected tables (items_state, stocks_state, stocking)
+- Effected Fields
+  - total_available_units ==> item_state
+  - total_available_pcs ===> item_state
+  - current_pcs ===> stocks_state
+  - current_units ===> stocks_state
+  - amount_in_units ===> stokcing
+- Equation of updating total available items in items_state table
+  - Total Available Items = Total Available Items + (New Amount in Units - Old Amount in Units)
+

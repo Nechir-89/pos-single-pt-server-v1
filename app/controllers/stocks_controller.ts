@@ -5,7 +5,8 @@ import {
   delete_stock_service,
   update_stock_expire_date_service,
   update_stock_barcodes_service,
-  delete_stock_service_2
+  delete_stock_service_2,
+  update_stock_amount_in_units_service
 } from '../services/stocks_service'
 import { Stock } from '../../types/Stock.types';
 
@@ -104,6 +105,38 @@ export const update_stock_barcodes: RequestHandler<
       req.body.stocking_id,
       req.body.barcode,
       req.body.pc_barcode
+    );
+    // http response code for update either going to be 200 or 204 (no content)
+    res.status(200).json(respond);
+  } catch (error) {
+    console.log(`server is running into an error \n ${error}`);
+    res.status(500).json({ error: "Server error" });
+  }
+}
+
+export const update_stock_amount_in_units: RequestHandler<
+  never,
+  Response,
+  {
+    item_id: number,
+    stocking_id: number,
+    state_id: number,
+    newtotalQuantityInUnits: number,
+    old_quantity_in_units: number,
+    newCurrentUnits: number,
+    newCurrentPcs: number
+  },
+  never
+> = async (req, res: Response) => {
+  try {
+    const respond = await update_stock_amount_in_units_service(
+      req.body.item_id,
+      req.body.stocking_id,
+      req.body.state_id,
+      req.body.newtotalQuantityInUnits,
+      req.body.old_quantity_in_units,
+      req.body.newCurrentUnits,
+      req.body.newCurrentPcs,
     );
     // http response code for update either going to be 200 or 204 (no content)
     res.status(200).json(respond);
