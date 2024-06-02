@@ -70,3 +70,14 @@
 - Equation of updating total available items in items_state table
   - Total Available Items = Total Available Items + (New Amount in Units - Old Amount in Units)
 
+### Updating cost and price of stock
+- While it would be inapproprate to update cost and price of stock if there are some amount of stock have been solid, but it is very important to let admin users update price and cost of stock as it is possible for users to input wrong stock cost/price.
+- Effected tables (stocking)
+- Effected Fields:
+  - unit_cost ===> stocking
+  - unit_price ===> stocking
+  - pc_cost ===> stocking
+  - pc_price ===> stocking
+
+
+

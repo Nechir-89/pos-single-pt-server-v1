@@ -122,7 +122,7 @@ export const update_stock_amount_in_units_service = async (
   newCurrentPcs: number
 ) => {
   console.log(`Updating stock amount in units for stocking id ${stocking_id}`)
-  
+
   try {
     // Update current units and pcs in stocks state table
     const updateStocksStateQuery = `UPDATE ${process.env.DB_SCHEMA}.stocks_state 
@@ -151,7 +151,7 @@ export const update_stock_amount_in_units_service = async (
 
     const respond = await db.one(UpdateItemStateQuery, {
       item_id,
-      state_id, 
+      state_id,
       newtotalQuantityInUnits,
       old_quantity_in_units
     })
@@ -160,6 +160,39 @@ export const update_stock_amount_in_units_service = async (
     return respond;
   } catch (error) {
     console.log(`Failed: updating amount in units  ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
+
+export const update_stock_cost_and_price_service = async (
+  stocking_id: number,
+  unit_cost: number,
+  unit_price: number,
+  pc_cost: number,
+  pc_price: number
+) => {
+  console.log(`Updating stock cost and price for stocking id ${stocking_id}`)
+
+  try {
+    const updateStockQuery = `UPDATE ${process.env.DB_SCHEMA}.stocking 
+                              SET unit_cost = $<unit_cost>, 
+                                  unit_price = $<unit_price>, 
+                                  pc_cost = $<pc_cost>, 
+                                  pc_price = $<pc_price> 
+                              WHERE stocking_id = $<stocking_id> 
+                              RETURNING stocking_id`
+    const respond = await db.one(updateStockQuery, {
+      stocking_id,
+      unit_cost,
+      unit_price,
+      pc_cost,
+      pc_price
+    })
+
+    console.log(`Passed: cost and price has been updated`)
+    return respond;
+  } catch (error) {
+    console.log(`Failed: updating cost and price  ==> ${error}`);
     return ({ error: `DB error` });
   }
 }
