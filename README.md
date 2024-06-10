@@ -80,5 +80,17 @@
   - pc_cost ===> stocking
   - pc_price ===> stocking
 
+### Payment method feature
+- This will set server version to 1.15.1 as we have 6 new APIs
+- New APIs:
+  - get, active, add, toggle, default_, and change_name
+  - default_ API will set all methods to false first and then set the targeted one to true
+- Effected tables:
+  - payment_methods
+- Two new fields have been added to payment_methods table (def, and active)
+- (note) field/column has been deleted from the table
+
+
+
 
 

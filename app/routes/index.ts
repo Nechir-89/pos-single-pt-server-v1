@@ -13,6 +13,7 @@ import general_queries_router from './general_queries_routes'
 import { new_stock } from '../middlewares/new_stock';
 import invoices_router from './invoices_routes';
 import non_scan_router from './non_scan_router';
+import payment_methods_router from './payment_methods_router';
 
 const router = Router();
 
@@ -45,5 +46,8 @@ router.use('/api/invoices', invoices_router)
 
 // Non scan items APIs
 router.use('/api/non-scan', non_scan_router)
+
+// Payment methods APIs
+router.use('/api/payment_methods', payment_methods_router)
 
 export default router;
