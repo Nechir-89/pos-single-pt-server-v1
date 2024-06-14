@@ -90,7 +90,7 @@
 - Two new fields have been added to payment_methods table (def, and active)
 - (note) field/column has been deleted from the table
 
-
-
-
+### Fixing bug: returning zero stock for non scan items
+- This will set client version to 2.15.2
+- Getting non scan items returns all stocks, zero and non zero stocks
 
